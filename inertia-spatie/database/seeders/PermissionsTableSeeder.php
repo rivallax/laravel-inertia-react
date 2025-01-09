@@ -1,96 +1,36 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace Database\Seeders;
 
-use Illuminate\Http\Request;
-use Illuminate\Routing\Controllers\HasMiddleware;
-use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
-class PermissionController extends Controller implements HasMiddleware
+class PermissionsTableSeeder extends Seeder
 {
-    public static function middleware()
-    {
-        return [
-            new Middleware('permission:permissions index', only: ['index']),
-            new Middleware('permission:permissions create', only: ['create', 'store']),
-            new Middleware('permission:permissions edit', only: ['edit', 'update']),
-            new Middleware('permission:permissions delete', only: ['destroy']),
-        ];
-    }
-
     /**
-     * Display a listing of the resource.
+     * Run the database seeds.
      */
-    public function index(Request $request)
+    public function run(): void
     {
-        //  get permissions
-        $permissions = Permission::select('id', 'name')
-            ->when($request->search, fn($search) => $search->where('name', 'like', '%' . $request->search . '%'))
-            ->latest()
-            ->paginate(6)->withQueryString();
 
-        // render view
-        return inertia('Permissions/Index', ['permissions' => $permissions, 'filters' => $request->only(['search'])]);
-    }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        // render view
-        return inertia('Permissions/Create');
-    }
+        //permission users
+        Permission::create(['name' => 'users index', 'guard_name' => 'web']);
+        Permission::create(['name' => 'users create', 'guard_name' => 'web']);
+        Permission::create(['name' => 'users edit', 'guard_name' => 'web']);
+        Permission::create(['name' => 'users delete', 'guard_name' => 'web']);
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        // validate request
-        $request->validate(['name' => 'required|min:3|max:255|unique:permissions']);
+        //permission roles
+        Permission::create(['name' => 'roles index', 'guard_name' => 'web']);
+        Permission::create(['name' => 'roles create', 'guard_name' => 'web']);
+        Permission::create(['name' => 'roles edit', 'guard_name' => 'web']);
+        Permission::create(['name' => 'roles delete', 'guard_name' => 'web']);
 
-        // create new permission data
-        Permission::create(['name' => $request->name]);
-
-        // render view
-        return to_route('permissions.index');
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Permission $permission)
-    {
-        // render view
-        return inertia('Permissions/Edit', ['permission' => $permission]);
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Permission $permission)
-    {
-        // validate request
-        $request->validate(['name' => 'required|min:3|max:255|unique:permissions,name,' . $permission->id]);
-
-        // update permission data
-        $permission->update(['name' => $request->name]);
-
-        // render view
-        return to_route('permissions.index');
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Permission $permission)
-    {
-        // delete permissions data
-        $permission->delete();
-
-        // render view
-        return back();
+        //permission permissions
+        Permission::create(['name' => 'permissions index', 'guard_name' => 'web']);
+        Permission::create(['name' => 'permissions create', 'guard_name' => 'web']);
+        Permission::create(['name' => 'permissions edit', 'guard_name' => 'web']);
+        Permission::create(['name' => 'permissions delete', 'guard_name' => 'web']);
     }
 }
